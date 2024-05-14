@@ -6,9 +6,15 @@ public class MainMenu implements ChoiceNotifier{
     private final Menu StartMenu;
     private Menu CurrentMenu;
     private boolean Running = false;
+    private boolean Closing = false;
+
 
     public Menu getStartMenu() {
         return StartMenu;
+    }
+
+    public boolean isClosing() {
+        return Closing;
     }
 
     public MainMenu(String i_MainMenuName)
@@ -46,15 +52,17 @@ public class MainMenu implements ChoiceNotifier{
         }
     }
 
-    public void stopRunning(){
+    public void pauseRunning(){
         Running = false;
     }
 
     public void previousMenu(){
         if(CurrentMenu.getPreviousMenu() != null)
             CurrentMenu = CurrentMenu.getPreviousMenu();
-        else
+        else{
             Running = false;
+            Closing = true;
+        }
     }
 
     public int receivedUserInput() throws NumberFormatException{

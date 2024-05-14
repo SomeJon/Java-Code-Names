@@ -1,23 +1,18 @@
 package ui;
 
 import engine.Definition;
-import engine.Engine;
 import engine.board.Board;
 import engine.data.GameStatus;
 import engine.data.Team;
 import menu.console.ChoiceNotifier;
+import menu.console.MainMenu;
 import menu.console.Menu;
 import engine.Engine.eMenuAction;
 import menu.console.MenuItem;
 
 public class UiAction implements engine.ui.UiAction, ChoiceNotifier {
-    private enum eOption{
-        LoadData,
-
-    }
-
     private UiData Data;
-    private eOption CurrentChoice;
+    private eMenuAction CurrentChoice;
 
     public static void main(String[] args) {
         UiAction uiAction = new UiAction();
@@ -37,8 +32,13 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier {
 
     @Override
     public eMenuAction openMenu() {
-        this.Data.getMainMenu().play();
-        return null;
+        MainMenu MainMenu = Data.getMainMenu();
+
+        MainMenu.play();
+        if(MainMenu.isClosing())
+            CurrentChoice = eMenuAction.Close;
+
+        return CurrentChoice;
     }
 
     @Override
@@ -80,7 +80,8 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier {
     public void Notify(Object sender) {
         eMenuAction action = (eMenuAction) ((MenuItem)sender).getItemValue();
         if (action == eMenuAction.LoadXml) {
-            System.out.println("Load data from an xml file");
+            CurrentChoice = action;
+            Data.getMainMenu().pauseRunning();
         }
     }
 }
