@@ -3,9 +3,9 @@ package engine.data;
 import java.util.List;
 
 public class GameStatus {
-    private List<Team> m_Teams;
-    private Integer m_NumOfWords;
-    private Integer m_NumOfBlackWords;
-    private Integer m_NumOfCards;
-    private Integer m_NumOfBlackCards;
+    private List<Team> Teams;
+    private Integer NumOfWords;
+    private Integer NumOfBlackWords;
+    private Integer NumOfCards;
+    private Integer NumOfBlackCards;
 }
