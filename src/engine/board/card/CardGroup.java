@@ -1,5 +1,10 @@
 package engine.board.card;
 
 public abstract class CardGroup {
-    private Integer NumOfCards;
+    protected Integer NumOfCards;
+    protected String Name;
+
+    public String getName() {
+        return Name;
+    }
 }
