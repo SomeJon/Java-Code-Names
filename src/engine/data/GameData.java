@@ -19,6 +19,9 @@ public class GameData {
     private ActiveGame ActiveData = null;
     private GameStatus Status = null;
 
+    public UiAction ui() {
+        return UserInterface;
+    }
 
     public GameData(UiAction i_UserInterface) {
         UserInterface = i_UserInterface;

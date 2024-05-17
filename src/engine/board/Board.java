@@ -6,8 +6,6 @@ import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
 import engine.data.GameStatus;
 import engine.data.Team;
-import javafx.geometry.Pos;
-import sun.invoke.empty.Empty;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,6 +27,22 @@ public class Board {
         CardGroups = new ArrayList<>();
     }
 
+    public int getNumOfColumns() {
+        return NumOfColumns;
+    }
+
+    public int getNumOfRows() {
+        return NumOfRows;
+    }
+
+    public int getBoardSize(){
+        return NumOfRows * NumOfColumns;
+    }
+
+    public List<CardGroup> getCardGroups() {
+        return CardGroups;
+    }
+
     public Card[][] getBoard() {
         return Board;
     }
@@ -45,16 +59,16 @@ public class Board {
         List<Card> cardsList = new ArrayList<>();
         int index = 0;
         for (Team team : BuildData.getTeams()) {
-            int cards = team.getBoardCards();
-            CardGroup groupTeam = new GroupTeam(team, cards);
+            int numOfCards = team.getPointGoal();
+            CardGroup groupTeam = new GroupTeam(team, numOfCards);
             returnedBoard.CardGroups.add(groupTeam);
-            for (int i = 0; i < cards; i++) {
+            for (int i = 0; i < numOfCards; i++) {
                 cardsList.add(new Card(ChosenWords.get(index), groupTeam));
                 index++;
             }
         }
 
-        CardGroup groupNeutral = new GroupNeutral(false, (normalWordCards - index), "Neutral");
+        CardGroup groupNeutral = new GroupNeutral(false, (normalWordCards - index));
         returnedBoard.CardGroups.add(groupNeutral);
         int normalWords = normalWordCards - index;
         for (int i = 0; i < normalWords; i++) {
@@ -62,7 +76,7 @@ public class Board {
             index++;
         }
 
-        CardGroup groupBlack = new GroupNeutral(false, (normalWordCards - index), "Black");
+        CardGroup groupBlack = new GroupNeutral(true, (normalWordCards - index));
         returnedBoard.CardGroups.add(groupBlack);
         ChosenBlackWords
                 .forEach(s -> cardsList.add(new Card(s, groupBlack)));
@@ -92,10 +106,21 @@ public class Board {
         Collections.shuffle(indexes);
         Board = new Card[NumOfRows][NumOfColumns];
 
+        if(numOfCards < NumOfColumns*NumOfRows) {
+            int remainder = NumOfColumns*NumOfRows - numOfCards;
+
+            numOfCards = NumOfColumns*NumOfRows;
+            for (int i = 0; i < remainder; i++) {
+                cards.add(null);
+            }
+        }
+
         for(int i = 0 ; i < numOfCards ; i++) {
             cards.get(i).setID(indexes.get(i));
             Postion pos = Postion.getPostion(indexes.get(i), NumOfColumns);
             Board[pos.getRow()][pos.getCol()] = cards.get(i);
         }
+
+
     }
 }

@@ -13,7 +13,7 @@ public interface UiAction {
     public String getXmlPath();
     public void exceptionHandler(Exception ReceivedError);
     public void showGameData(GameStatus ReceivedGameStatus);
-    public void showBoard(Board ReceivedBoard);
+    public void showBoard(Board ReceivedBoard, boolean i_Visible);
     public void showTurn(Team PlayingTeam, Board RecivedBoard);
     public Definition getDefinition();
     public void guessResult(String Received);

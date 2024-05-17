@@ -32,7 +32,7 @@ public class GameStatus {
     public GameStatus(List<Team> teams, Integer numOfWords, Integer numOfBlackWords,
                       Integer numOfCards, Integer numOfBlackCards) {
         int sumOfTeamCards = teams.stream()
-                .mapToInt(Team::getBoardCards)
+                .mapToInt(Team::getPointGoal)
                 .sum();
         boolean uniqueNames = teams.stream()
                 .map(Team::getName)

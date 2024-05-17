@@ -4,28 +4,19 @@ import engine.board.card.CardGroup;
 
 public class Team extends CardGroup{
     private final String Name;
-    private final int BoardCards;
-    private int CardsFound;
+    private final int PointGoal;
+
 
     public String getName() {
         return Name;
     }
 
-    public int getBoardCards() {
-        return BoardCards;
-    }
-
-    public int getCardsFound() {
-        return CardsFound;
+    public int getPointGoal() {
+        return PointGoal;
     }
 
     public Team(String name, int cardsOnBoard) {
         Name = name;
-        BoardCards = cardsOnBoard;
-        CardsFound = 0;
-    }
-
-    public void foundCard(){
-        CardsFound++;
+        PointGoal = cardsOnBoard;
     }
 }

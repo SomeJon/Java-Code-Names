@@ -8,9 +8,8 @@ public class GroupNeutral extends CardGroup{
         return IsBlack;
     }
 
-    public GroupNeutral(boolean i_IsBlack, Integer i_NumOfCards, String i_Name) {
-        NumOfCards = i_NumOfCards;
+    public GroupNeutral(boolean i_IsBlack, Integer i_NumOfCards) {
+        CardsLeft = i_NumOfCards;
         IsBlack = i_IsBlack;
-        Name = i_Name;
     }
 }
