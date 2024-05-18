@@ -146,10 +146,11 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier {
         int neededSpaces = i_LineSize - i_String.length();
         StringBuilder returnString = new StringBuilder();
 
+
         for(int i = 0; i < neededSpaces; i++){
-            returnString.append(" ");
-            if(i == neededSpaces/2 - 1)
+            if(i == neededSpaces/2)
                 returnString.append(i_String);
+            returnString.append(" ");
         }
 
         return returnString.toString();
