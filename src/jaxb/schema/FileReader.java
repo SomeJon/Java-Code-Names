@@ -15,9 +15,9 @@ import java.util.*;
 public class FileReader {
     private static final String JAXB_XML_GAME_PACKAGE_NAME = "jaxb.schema.generated";
 
-    public static void ReadXml(String FilePath, GameData DataHolder) throws JAXBException, IOException {
+    public static void ReadXml(File i_File, GameData i_DataHolder) throws JAXBException, IOException {
 
-        InputStream inputStream = Files.newInputStream(new File(FilePath).toPath());
+        InputStream inputStream = Files.newInputStream(i_File.toPath());
         ECNGame gameData = deserializeFrom(inputStream);
 
         String[] words;
@@ -33,7 +33,7 @@ public class FileReader {
 
         int columns = gameData.getECNBoard().getECNLayout().getColumns();
         int rows = gameData.getECNBoard().getECNLayout().getRows();
-        DataHolder.loadData(status, columns, rows, normalWords, blackWords);
+        i_DataHolder.loadData(status, columns, rows, normalWords, blackWords);
         System.out.println(gameData);
 
     }

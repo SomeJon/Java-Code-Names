@@ -75,12 +75,10 @@ public class Menu{
                 choiceNumbering++;
             }
 
-            System.out.println(
+            System.out.print(
                     "\n0 -> " + endingMenuItemPrint +
                         "\n" + dashes +
-                            "\n" + "Enter your request: " +
-                            "(" + START_NUMBER + " to " + MenuItems.size() +
-                            "or press '0' to "+ endingMenuItemPrint + ")");
+                            "\n" + "Enter your choice: ");
         }
 
         private String endingMenuItem() {

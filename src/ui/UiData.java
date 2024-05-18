@@ -1,36 +1,39 @@
 package ui;
 
 import menu.console.MainMenu;
+import ui.input.InputHandling;
+import ui.interfaces.UiActionConst;
 
 import java.util.Collections;
 import java.util.List;
 
-public class UiData {
-    public final static String BLACK = "BLACK";
-    public final static String NEUTRAL = "";
-    public final static String FLIPPED = "V";
-    public final static String NOT_FLIPPED = "X";
-    public final static int NEUTRAL_MAX_NAME_LENGTH = 5;
-    public final static int IDENTIFICATION_LINE_ADDONS_SIZE = 6; //using -"[]  ()"
-    public final static int CARD_LINE_SPACING = 2;
-    public final static int SPACE_BETWEEN_CARDS = 1;
+public class UiData implements UiActionConst {
     private MainMenu MainMenu;
     private int CardLineSize;
     private int LineSize;
     private List<String> FirstLines;
     private String ClosingLine;
-    private boolean Update = true;
+    private boolean LoadedAFile = false;
+    private InputHandling NextInput;
+
+    public InputHandling getNextInput() {
+        return NextInput;
+    }
+
+    public void setNextInput(InputHandling i_NextInput) {
+        NextInput = i_NextInput;
+    }
 
     public String getClosingLine() {
         return ClosingLine;
     }
 
-    public void flipUpdate(){
-        Update = !Update;
+    public void fileLoaded(){
+        LoadedAFile = true;
     }
 
-    public boolean isUpdate() {
-        return Update;
+    public boolean hasAFile() {
+        return LoadedAFile;
     }
 
     public List<String> getFirstLines() {

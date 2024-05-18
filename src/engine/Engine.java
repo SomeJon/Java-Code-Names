@@ -1,18 +1,21 @@
 package engine;
 
-import engine.board.card.Card;
 import engine.data.GameData;
-import jaxb.schema.FileReader;
+import engine.response.LoadXmlResponse;
+import engine.response.Response;
 import ui.UiAction;
+import jaxb.schema.FileReader;
+
+import java.io.File;
 
 public class Engine {
-    public enum eMenuAction {
-        LoadXml,
-        ShowGameData,
-        StartGame,
-        PlayTurn,
-        GameStatus,
-        Close
+    public enum MenuAction {
+        LOAD_XML,
+        SHOW_GAME_DATA,
+        START_GAME,
+        PLAYER_TURN,
+        GAME_STATUS,
+        CLOSE
     }
     public enum eGuessResult{
         CorrectTeam,
@@ -23,33 +26,44 @@ public class Engine {
 
 
     private final GameData Data;
+    private final UiAction Ui;
 
-
-    public static void main(String[] args) {
-        Engine engine = new Engine(new ui.UiAction());
-        engine.loadXml("C:\\Users\\bhbha\\IdeaProjects\\JavaCodeNames\\src\\resource\\classic.xml");
-        engine.Data.startBoard();
-        System.out.println("ehhhh");
+    public Engine(UiAction i_UiLink) {
+        Data = new GameData(i_UiLink);
+        Ui = i_UiLink;
     }
 
-    public Engine(UiAction UiLinker) {
-        Data = new GameData(UiLinker);
+    public void startGame(){
+        MenuAction menuAction;
+        Ui.buildStartingMenu();
+
+        do {
+            menuAction = Ui.openMenu();
+
+            switch (menuAction) {
+                case LOAD_XML:
+                    loadXml();
+            }
+
+            Ui.showBoard(Data.getActiveData().getPlayingBoard(), false);
+            Ui.showBoard(Data.getActiveData().getPlayingBoard(), true);
+
+        }while(menuAction != MenuAction.CLOSE);
     }
 
-    public void startEngine(){
-        loadXml("C:\\Users\\bhbha\\IdeaProjects\\JavaCodeNames\\src\\resource\\classic.xml");
-        Data.startBoard();
-        Data.ui().showBoard(Data.getActiveData().getPlayingBoard(), false);
-        Data.ui().showBoard(Data.getActiveData().getPlayingBoard(), true);
-
-    }
-
-    private void loadXml(String filePath) {
-        try {
-            FileReader.ReadXml(filePath, Data);
-        }
-        catch (Exception ignored) {
-            System.out.println("Error reading xml file");
+    private void loadXml() {
+        Ui.askForXml();
+        LoadXmlResponse loadXml = new LoadXmlResponse();
+        Ui.getResponse(loadXml);
+        if(loadXml.receivedResponse()) {
+            File responseFile = loadXml.getInputFile();
+            try {
+                FileReader.ReadXml(responseFile, Data);
+                Data.startBoard(); //todo change this placemeant!
+                Ui.updateBoard(Data.getActiveData().getPlayingBoard());
+            } catch (Exception ignored) {
+                System.out.println("Error reading xml file");
+            }
         }
     }
 }

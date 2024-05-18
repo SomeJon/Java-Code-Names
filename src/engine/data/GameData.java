@@ -19,7 +19,7 @@ public class GameData {
     private ActiveGame ActiveData = null;
     private GameStatus Status = null;
 
-    public UiAction ui() {
+    public UiAction getUiAction() {
         return UserInterface;
     }
 
