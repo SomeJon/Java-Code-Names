@@ -1,35 +1,25 @@
 package ui;
 
-import engine.Definition;
-import engine.Engine; //to del
 import engine.board.Board;
 import engine.board.card.Card;
 import engine.board.card.CardGroup;
 import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
-import engine.data.GameStatus;
-import engine.data.Team;
+import engine.response.Response;
 import menu.console.ChoiceNotifier;
 import menu.console.MainMenu;
 import menu.console.Menu;
-import engine.Engine.eMenuAction;
+import engine.Engine.MenuAction;
 import menu.console.MenuItem;
+import ui.input.InputHandling;
+import ui.interfaces.UiActionConst;
 
 import java.util.*;
 
 
-public class UiAction implements engine.ui.UiAction, ChoiceNotifier {
+public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionConst {
     private UiData Data;
-    private eMenuAction CurrentChoice;
-
-    public static void main(String[] args) {
-        UiAction uiAction = new UiAction();
-        Engine engine = new Engine(uiAction);
-
-        engine.startEngine();
-        uiAction.buildStartingMenu();
-        uiAction.openMenu();
-    }
+    private MenuAction CurrentChoice;
 
     public UiAction() {
         Data = new UiData();
@@ -38,46 +28,26 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier {
     @Override
     public void buildStartingMenu() {
         Menu StartMenu = Data.getMainMenu().getStartMenu();
-        StartMenu.createMenuOption("Load data from an xml file", eMenuAction.LoadXml, this);
+        StartMenu.createMenuOption("Load data from an xml file.", MenuAction.LOAD_XML, this);
     }
 
     @Override
-    public eMenuAction openMenu() {
+    public MenuAction openMenu() {
         MainMenu MainMenu = Data.getMainMenu();
 
         MainMenu.play();
         if(MainMenu.isClosing())
-            CurrentChoice = eMenuAction.Close;
+            CurrentChoice = MenuAction.CLOSE;
 
         return CurrentChoice;
     }
 
-    @Override
-    public String getXmlPath() {
-        return "";
-    }
-
-    @Override
-    public void exceptionHandler(Exception ReceivedError) {
-
-    }
-
-    @Override
-    public void showGameData(GameStatus ReceivedGameStatus) {
-
-    }
 
     @Override
     public void showBoard(Board i_ReceivedBoard, boolean i_Visible) {
         Card[][] board = i_ReceivedBoard.getBoard();
         int rows = i_ReceivedBoard.getNumOfRows();
         List<String> secondLines;
-
-        if(Data.isUpdate()){
-            updateBuildingData(i_ReceivedBoard);
-            Data.setFirstLines(createLines(board, rows, true, i_Visible));
-            Data.flipUpdate();
-        }
 
         secondLines = createLines(board, rows, false, i_Visible);
         for(int i = 0; i < rows ; i++){
@@ -89,31 +59,59 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier {
         System.out.println(Data.getClosingLine());
     }
 
+    @Override
+    public void getResponse(Response o_Response) {
+        Data.getNextInput().getInput(o_Response);
+    }
+
+    @Override
+    public void askForXml() {
+        System.out.println("Please enter a full path to a fitting xml file");
+        System.out.print("Path: ");
+    }
+
+    @Override
+    public void updateBoard(Board i_ReceivedBoard) {
+        Card[][] board = i_ReceivedBoard.getBoard();
+        int rows = i_ReceivedBoard.getNumOfRows();
+
+        if(!Data.hasAFile()){
+            Menu menu = Data.getMainMenu().getStartMenu();
+            menu.createMenuOption("Show game details.", MenuAction.GAME_STATUS, this);
+            menu.createMenuOption("Start a new game.",
+                    MenuAction.START_GAME, this);
+
+            Data.fileLoaded();
+        }
+
+        updateBuildingData(i_ReceivedBoard);
+        Data.setFirstLines(createLines(board, rows, true, false));
+    }
+
     private List<String> createLines(Card[][] i_Board, int i_NumOfRows,
                                      boolean i_First, boolean i_Visible){
         List<String> lines = new ArrayList<>();
 
         for(int i = 0; i < i_NumOfRows; i++){
-            String line = "";
+            StringBuilder line = new StringBuilder();
             for(Card card : i_Board[i]){
                 if(i_First) {
-                    line += "|" + firstCardLine(card);
+                    line.append("|").append(firstCardLine(card));
                 }
                 else{
-                    line += "|" + secondCardLine(card, i_Visible);
+                    line.append("|").append(secondCardLine(card, i_Visible));
                 }
             }
 
-            line += "|";
-            lines.add(line);
+            line.append("|");
+            lines.add(line.toString());
         }
 
         return lines;
     }
 
     private String firstCardLine(Card i_Card){
-        String a = alignString(i_Card.getText(), Data.getCardLineSize());
-        return a;
+        return alignString(i_Card.getText(), Data.getCardLineSize());
     }
 
     private String secondCardLine(Card i_Card, boolean i_Visible){
@@ -127,15 +125,15 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier {
             groupName = "(" + ((GroupTeam)group).getName() + ")";
         }
         else if(((GroupNeutral)group).isBlack()){
-            groupName = "(" + UiData.BLACK + ")";
+            groupName = "(" + BLACK + ")";
         }
         else{
             groupName = "";
         }
 
         endText = i_Visible?
-                " " + (i_Card.isFlipped()? UiData.FLIPPED : UiData.NOT_FLIPPED) + " " + groupName :
-                i_Card.isFlipped()? " " + UiData.FLIPPED + " " + groupName : "";
+                " " + (i_Card.isFlipped()? FLIPPED : NOT_FLIPPED) + " " + groupName :
+                i_Card.isFlipped()? " " + FLIPPED + " " + groupName : "";
 
         text = "[" + i_Card.getID() + "]" + endText;
 
@@ -156,27 +154,14 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier {
         return returnString.toString();
     }
 
-    @Override
-    public void showTurn(Team PlayingTeam, Board RecivedBoard) {
-
-    }
-
-    @Override
-    public Definition getDefinition() {
-        return null;
-    }
-
-    @Override
-    public void guessResult(String Received) {
-
-    }
 
     @Override
     public void Notify(Object sender) {
-        eMenuAction action = (eMenuAction) ((MenuItem)sender).getItemValue();
-        if (action == eMenuAction.LoadXml) {
+        MenuAction action = (MenuAction) ((MenuItem)sender).getItemValue();
+        if (action == MenuAction.LOAD_XML) {
             CurrentChoice = action;
             Data.getMainMenu().pauseRunning();
+            Data.setNextInput(InputHandling.FILE_PATH);
         }
     }
 
@@ -188,8 +173,8 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier {
         int maxLineIdentification;
         int maxLineLength;
 
-        maxLineIdentification = Integer.max(maxTeamName, UiData.NEUTRAL_MAX_NAME_LENGTH)
-                + UiData.IDENTIFICATION_LINE_ADDONS_SIZE + maxIdDigits;
+        maxLineIdentification = Integer.max(maxTeamName, NEUTRAL_MAX_NAME_LENGTH)
+                + IDENTIFICATION_LINE_ADDONS_SIZE + maxIdDigits;
         maxLineLength = Integer.max(maxLineIdentification, maxWordSize);
 
         Data.setCardLineSize(maxLineLength, i_RecivedBoard.getNumOfColumns());
