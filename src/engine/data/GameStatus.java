@@ -1,6 +1,10 @@
 package engine.data;
 
+import engine.exception.loadxml.OutOfBoundLoad;
+import engine.exception.loadxml.TeamNamesNotUnique;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GameStatus {
     private final List<Team> Teams;
@@ -30,7 +34,7 @@ public class GameStatus {
     }
 
     public GameStatus(List<Team> teams, Integer numOfWords, Integer numOfBlackWords,
-                      Integer numOfCards, Integer numOfBlackCards) {
+                      Integer numOfCards, Integer numOfBlackCards){
         int sumOfTeamCards = teams.stream()
                 .mapToInt(Team::getPointGoal)
                 .sum();
@@ -40,16 +44,19 @@ public class GameStatus {
                 .count() == teams.size();
 
         if (!uniqueNames) {
-            throw new IllegalArgumentException("Teams must have unique names");
+            List<String> teamNames = teams.stream()
+                    .map(Team::getName)
+                    .collect(Collectors.toList());
+            throw new TeamNamesNotUnique(teamNames);
         }
         if(numOfWords < numOfCards){
-            throw new IllegalArgumentException("Number of words must be greater than the number of words");
+            throw new OutOfBoundLoad("Cards", numOfCards, numOfWords, 0);
         }
         if(numOfBlackWords < numOfBlackCards){
-            throw new IllegalArgumentException("Number of black words must be greater than the number of black words");
+            throw new OutOfBoundLoad("Black Cards", numOfBlackCards, numOfBlackWords, 0);
         }
-        if(sumOfTeamCards > numOfCards){
-            throw  new IllegalArgumentException("sumOfTeamCards must be less than numOfCards");
+        if(numOfCards < sumOfTeamCards){
+            throw  new OutOfBoundLoad("Team Cards", sumOfTeamCards, numOfCards, 0);
         }
 
         Teams = teams;

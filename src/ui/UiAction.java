@@ -5,6 +5,10 @@ import engine.board.card.Card;
 import engine.board.card.CardGroup;
 import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
+import engine.exception.CodeNameExceptions;
+import engine.exception.OutOfBoundException;
+import engine.exception.loadxml.OutOfBoundLoad;
+import engine.exception.loadxml.TeamNamesNotUnique;
 import engine.response.Response;
 import menu.console.ChoiceNotifier;
 import menu.console.MainMenu;
@@ -61,7 +65,11 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
 
     @Override
     public void getResponse(Response o_Response) {
-        Data.getNextInput().getInput(o_Response);
+        try {
+            Data.getNextInput().getInput(o_Response);
+        } catch (CodeNameExceptions e) {
+            this.exceptionHandler(e);
+        }
     }
 
     @Override
@@ -86,6 +94,39 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
 
         updateBuildingData(i_ReceivedBoard);
         Data.setFirstLines(createLines(board, rows, true, false));
+    }
+
+    @Override
+    public void exceptionHandler(CodeNameExceptions i_ReceivedError) {
+        System.out.println("!!!An error occurred!!!");
+
+        switch(i_ReceivedError.getType()){
+            case LOAD_FILE:
+                System.out.println("The error occurred while loading the file,");
+                break;
+            case CHECK_PATH:
+                System.out.println("The error occurred while checking the path,");
+        }
+
+        if(i_ReceivedError instanceof OutOfBoundException){
+            OutOfBoundException Received = (OutOfBoundException)i_ReceivedError;
+            System.out.println("Error is the result of ");
+            if(Received instanceof OutOfBoundLoad){
+                System.out.print("the logic in file, ");
+            }
+
+            System.out.println("Entered " + Received.getMessage() + " with value " +
+                    Received.getParameterValue() + " while expected value to be in range: (" +
+                    Received.getMin() + " - " + Received.getMax() + ")");
+        }
+
+        if(i_ReceivedError instanceof TeamNamesNotUnique){
+            TeamNamesNotUnique Received = (TeamNamesNotUnique)i_ReceivedError;
+            System.out.print("Error is the result of non unique team names, " +
+                    "entered team name were:");
+            Received.getNonUniqueNames()
+            .forEach(s -> System.out.print(" \"" + s + "\","));
+        }
     }
 
     private List<String> createLines(Card[][] i_Board, int i_NumOfRows,

@@ -1,12 +1,14 @@
 package engine;
 
 import engine.data.GameData;
+import engine.exception.CodeNameExceptions;
 import engine.response.LoadXmlResponse;
 import engine.response.Response;
 import ui.UiAction;
 import jaxb.schema.FileReader;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class Engine {
     public enum MenuAction {
@@ -61,9 +63,9 @@ public class Engine {
                 FileReader.ReadXml(responseFile, Data);
                 Data.startBoard(); //todo change this placemeant!
                 Ui.updateBoard(Data.getActiveData().getPlayingBoard());
-            } catch (Exception ignored) {
+            } catch (CodeNameExceptions e) {
                 System.out.println("Error reading xml file");
-            }
+            } catch (Exception ignore) {}
         }
     }
 }
