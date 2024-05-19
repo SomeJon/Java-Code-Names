@@ -5,16 +5,15 @@ import engine.board.card.Card;
 import engine.board.card.CardGroup;
 import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
+import engine.data.GameStatus;
+import engine.data.Team;
 import engine.exception.CodeNameExceptions;
 import engine.exception.OutOfBoundException;
 import engine.exception.loadxml.OutOfBoundLoad;
 import engine.exception.loadxml.TeamNamesNotUnique;
 import engine.response.Response;
-import menu.console.ChoiceNotifier;
-import menu.console.MainMenu;
-import menu.console.Menu;
+import menu.console.*;
 import engine.Engine.MenuAction;
-import menu.console.MenuItem;
 import ui.input.InputHandling;
 import ui.interfaces.UiActionConst;
 
@@ -79,10 +78,7 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
     }
 
     @Override
-    public void updateBoard(Board i_ReceivedBoard) {
-        Card[][] board = i_ReceivedBoard.getBoard();
-        int rows = i_ReceivedBoard.getNumOfRows();
-
+    public void addFileData() {
         if(!Data.hasAFile()){
             Menu menu = Data.getMainMenu().getStartMenu();
             menu.createMenuOption("Show game details.", MenuAction.GAME_STATUS, this);
@@ -91,6 +87,12 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
 
             Data.fileLoaded();
         }
+    }
+
+    @Override
+    public void updateBoard(Board i_ReceivedBoard) {
+        Card[][] board = i_ReceivedBoard.getBoard();
+        int rows = i_ReceivedBoard.getNumOfRows();
 
         updateBuildingData(i_ReceivedBoard);
         Data.setFirstLines(createLines(board, rows, true, false));
@@ -98,7 +100,7 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
 
     @Override
     public void exceptionHandler(CodeNameExceptions i_ReceivedError) {
-        System.out.println("!!!An error occurred!!!");
+        System.out.println("\n!!!An error occurred!!!");
 
         switch(i_ReceivedError.getType()){
             case LOAD_FILE:
@@ -127,6 +129,28 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
             Received.getNonUniqueNames()
             .forEach(s -> System.out.print(" \"" + s + "\","));
         }
+
+        System.out.println("!!!!!!\n");
+    }
+
+    @Override
+    public void showGameDetails(GameStatus i_ReceivedGameStatus) {
+        List<Team> teams = i_ReceivedGameStatus.getTeams();
+
+        System.out.println("Current game details: ");
+        System.out.println("Current word bank size: " +
+                i_ReceivedGameStatus.getNumOfWords());
+        System.out.println("Current black word bank size: " +
+                i_ReceivedGameStatus.getNumOfBlackWords());
+        System.out.println("Participating Words: (Normal:" +
+                i_ReceivedGameStatus.getNumOfCards() +
+                ") (Black:" + i_ReceivedGameStatus.getNumOfBlackWords()
+                +")");
+
+        teams.forEach(t -> System.out.println("-------------------\nTeam Name: " + t.getName() +
+                "\nWord goal: " + t.getPointGoal()));
+        System.out.println("---------------------\n");
+
     }
 
     private List<String> createLines(Card[][] i_Board, int i_NumOfRows,
@@ -199,10 +223,14 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
     @Override
     public void Notify(Object sender) {
         MenuAction action = (MenuAction) ((MenuItem)sender).getItemValue();
-        if (action == MenuAction.LOAD_XML) {
-            CurrentChoice = action;
-            Data.getMainMenu().pauseRunning();
-            Data.setNextInput(InputHandling.FILE_PATH);
+
+        CurrentChoice = action;
+        Data.getMainMenu().pauseRunning();
+
+        switch (action){
+            case LOAD_XML:
+                Data.setNextInput(InputHandling.FILE_PATH);
+                break;
         }
     }
 
@@ -247,5 +275,11 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
                 .map(String::length)
                 .max(Integer::compareTo)
                 .orElse(0);
+    }
+
+    public static void errorPrint(String errorMessage){
+        System.out.println("\n!!!An error occurred!!!");
+        System.out.println(errorMessage);
+        System.out.println("!!!!!!\n");
     }
 }

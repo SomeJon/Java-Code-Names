@@ -45,10 +45,17 @@ public class Engine {
             switch (menuAction) {
                 case LOAD_XML:
                     loadXml();
+                    break;
+                case GAME_STATUS:
+                    Ui.showGameDetails(Data.getStatus());
+                    break;
+                case START_GAME:
+                    Data.startBoard();
+                    Ui.updateBoard(Data.getActiveData().getPlayingBoard());
+                    Ui.showBoard(Data.getActiveData().getPlayingBoard(), false);
+                    Ui.showBoard(Data.getActiveData().getPlayingBoard(), true);
+                    break;
             }
-
-            Ui.showBoard(Data.getActiveData().getPlayingBoard(), false);
-            Ui.showBoard(Data.getActiveData().getPlayingBoard(), true);
 
         }while(menuAction != MenuAction.CLOSE);
     }
@@ -61,8 +68,7 @@ public class Engine {
             File responseFile = loadXml.getInputFile();
             try {
                 FileReader.ReadXml(responseFile, Data);
-                Data.startBoard(); //todo change this placemeant!
-                Ui.updateBoard(Data.getActiveData().getPlayingBoard());
+                Ui.addFileData();
             } catch (CodeNameExceptions e) {
                 System.out.println("Error reading xml file");
             } catch (Exception ignore) {}

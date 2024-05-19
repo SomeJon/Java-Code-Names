@@ -2,6 +2,7 @@ package ui.input;
 
 import engine.response.LoadXmlResponse;
 import engine.response.Response;
+import ui.UiAction;
 
 import java.io.File;
 import java.util.Scanner;
@@ -17,9 +18,9 @@ public enum InputHandling {
             File file = new File(path);
 
             if (!file.isFile()) {
-                System.out.println("A file was not found at the given path!");
+                UiAction.errorPrint("A file was not found at the given path!");
             } else if (!path.endsWith(".xml")) {
-                System.out.println("File path does not lead to an xml file!");
+                UiAction.errorPrint("File path does not lead to an xml file!");
             } else {
                 o_Response.loadResponse(new LoadXmlResponse(file));
             }

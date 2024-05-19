@@ -1,5 +1,6 @@
 package menu.console;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class MainMenu implements ChoiceNotifier{
@@ -30,24 +31,12 @@ public class MainMenu implements ChoiceNotifier{
         Running = true;
 
         while(Running) {
-            try {
-                CurrentMenu.printMenu(20);
-                int userIntInput = receivedUserInput();
-                if (userIntInput != 0) {
-                    if(userIntInput > CurrentMenu.getMenuItems().size() || userIntInput < 0) {
-                        System.out.println("Input out of range! Please Enter an Integer in the correct range!");
-                    }
-                    else {
-                        CurrentMenu.getMenuItems().get(userIntInput - 1).MenuItemChosen();
-                    }
-
-                } else {
-                    previousMenu();
-                }
-            }
-            catch(NumberFormatException i_ExceptionOccurred) {
-                System.out.println("!!!!Incorrect input type! Please enter an int!!!!!\n");
-                PauseConsole.Pause();
+            CurrentMenu.printMenu(20);
+            int userIntInput = receivedUserInput(0, CurrentMenu.getMenuItems().size());
+            if (userIntInput != 0) {
+                CurrentMenu.getMenuItems().get(userIntInput - 1).MenuItemChosen();
+            } else {
+                previousMenu();
             }
         }
     }
@@ -65,11 +54,32 @@ public class MainMenu implements ChoiceNotifier{
         }
     }
 
-    public int receivedUserInput() throws NumberFormatException{
+    public int receivedUserInput(int min, int max){
             Scanner scanner = new Scanner(System.in);
-            String userInput = scanner.nextLine();
+            boolean continueLoop;
+            int userInput = 0;
 
-            return Integer.parseInt(userInput);
+            do {
+                try {
+                    userInput = scanner.nextInt();
+                    if (userInput >= min && userInput <= max) {
+                        continueLoop = false;
+                    }
+                    else{
+                        continueLoop = true;
+                        System.out.println("!!!!Input out of range! range for input: " +
+                                        min + "-" + max + "!!!!!");
+                        System.out.print("Enter your choice: ");
+                    }
+                } catch (InputMismatchException i_ExceptionOccurred) {
+                    continueLoop = true;
+                    scanner.nextLine();
+                    System.out.println("!!!!Incorrect input type! Please enter an int!!!!!");
+                    System.out.print("Enter your choice: ");
+                }
+            } while(continueLoop);
+
+            return userInput;
     }
 
     public void Notify(Object sender) {
