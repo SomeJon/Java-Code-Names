@@ -2,11 +2,11 @@ package engine.board.card;
 
 
 public abstract class CardGroup {
-    protected int CardsLeft;
+    protected int Cards;
     protected int CardsFlipped = 0;
 
-    public int getCardsLeft() {
-        return CardsLeft;
+    public int getCards() {
+        return Cards;
     }
 
     public int getCardsFlipped() {
@@ -14,7 +14,6 @@ public abstract class CardGroup {
     }
 
     public void cardDown(){
-        CardsLeft--;
         CardsFlipped++;
     }
 }

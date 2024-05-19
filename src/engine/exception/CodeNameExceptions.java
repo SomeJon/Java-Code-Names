@@ -3,7 +3,8 @@ package engine.exception;
 public abstract class CodeNameExceptions extends RuntimeException {
     public enum ExceptionType {
         LOAD_FILE,
-        CHECK_PATH
+        CHECK_PATH,
+        TURN_EXCEPTION
     }
 
     private ExceptionType Type;

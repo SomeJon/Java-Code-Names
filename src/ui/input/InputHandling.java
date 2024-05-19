@@ -1,14 +1,17 @@
 package ui.input;
 
+import engine.response.IdentificationResponse;
 import engine.response.LoadXmlResponse;
 import engine.response.Response;
 import ui.UiAction;
 
 import java.io.File;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public enum InputHandling {
     FILE_PATH{
+        @Override
         public void getInput(Response o_Response) {
             Scanner scanner = new Scanner(System.in);
 
@@ -27,10 +30,37 @@ public enum InputHandling {
         }
     },
     IDENTIFICATION{
-                public void getInput(Response o_Response){
+        @Override
+        public void getInput(Response o_Response) {
+            Scanner scanner = new Scanner(System.in);
+            boolean continueLoop;
 
+            System.out.println("Please enter an identification word and number of related words after");
+            System.out.print("Identification word: ");
+            String identificationWord = scanner.nextLine();
+            System.out.print("Number of related words: ");
+            int numberOfRelatedWords = 0;
+
+            do {
+                try {
+                    numberOfRelatedWords = scanner.nextInt();
+                    continueLoop = false;
+                } catch (InputMismatchException e) {
+                    continueLoop = true;
+                    UiAction.errorPrint("Non Number entered! please try again");
                 }
+            } while (continueLoop);
+
+            o_Response.loadResponse(new IdentificationResponse(identificationWord, numberOfRelatedWords));
+        }
+    },
+    GUSSER{
+        @Override
+        public void getInput(Response o_Response) {
+
+        }
     };
+
 
     public abstract void getInput(Response o_Response);
 }

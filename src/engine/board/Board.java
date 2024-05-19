@@ -18,6 +18,7 @@ public class Board {
     private final int NumOfRows;
     private Card[][] Board;
     private final List<CardGroup> CardGroups;
+    private final List<GroupTeam> GroupTeams;
     private List<Card> test;
 
 
@@ -25,6 +26,11 @@ public class Board {
         NumOfRows = numOfRows;
         NumOfColumns = numOfColumns;
         CardGroups = new ArrayList<>();
+        GroupTeams = new ArrayList<>();
+    }
+
+    public List<GroupTeam> getGroupTeams() {
+        return GroupTeams;
     }
 
     public int getNumOfColumns() {
@@ -60,8 +66,9 @@ public class Board {
         int index = 0;
         for (Team team : BuildData.getTeams()) {
             int numOfCards = team.getPointGoal();
-            CardGroup groupTeam = new GroupTeam(team, numOfCards);
+            GroupTeam groupTeam = new GroupTeam(team, numOfCards);
             returnedBoard.CardGroups.add(groupTeam);
+            returnedBoard.GroupTeams.add(groupTeam);
             for (int i = 0; i < numOfCards; i++) {
                 cardsList.add(new Card(ChosenWords.get(index), groupTeam));
                 index++;

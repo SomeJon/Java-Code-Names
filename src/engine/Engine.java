@@ -1,14 +1,17 @@
 package engine;
 
+import engine.board.Board;
+import engine.board.card.GroupTeam;
 import engine.data.GameData;
+import engine.data.Identification;
 import engine.exception.CodeNameExceptions;
+import engine.exception.turn.IdentificationException;
+import engine.response.IdentificationResponse;
 import engine.response.LoadXmlResponse;
-import engine.response.Response;
 import ui.UiAction;
 import jaxb.schema.FileReader;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 public class Engine {
     public enum MenuAction {
@@ -46,14 +49,15 @@ public class Engine {
                 case LOAD_XML:
                     loadXml();
                     break;
-                case GAME_STATUS:
+                case SHOW_GAME_DATA:
                     Ui.showGameDetails(Data.getStatus());
                     break;
                 case START_GAME:
                     Data.startBoard();
                     Ui.updateBoard(Data.getActiveData().getPlayingBoard());
-                    Ui.showBoard(Data.getActiveData().getPlayingBoard(), false);
-                    Ui.showBoard(Data.getActiveData().getPlayingBoard(), true);
+                    break;
+                case PLAYER_TURN:
+                    playTurn();
                     break;
             }
 
@@ -73,5 +77,38 @@ public class Engine {
                 System.out.println("Error reading xml file");
             } catch (Exception ignore) {}
         }
+    }
+
+    public void playTurn(){
+        boolean loopContinue;
+        IdentificationResponse response;
+        GroupTeam playingTeam = Data.getActiveData().getPlayingTeamGreoup();
+        Board playingBoard = Data.getActiveData().getPlayingBoard();
+        Identification currentIdentification = null;
+                
+        Ui.showTeam(playingTeam);
+        Ui.showBoard(playingBoard, true);
+
+        do {
+            response = new IdentificationResponse();
+            Ui.getResponse(response);
+            if(response.getRelated() >
+                    playingTeam.getCards() - playingTeam.getCardsFlipped() || response.getRelated() < 1) {
+                loopContinue = true;
+                Ui.exceptionHandler(new IdentificationException("Related words", response.getRelated(),
+                playingTeam.getCards() - playingTeam.getCardsFlipped(), 1));
+            }
+            else{
+                loopContinue = false;
+                currentIdentification = new Identification(response.getIdentification(), response.getRelated());
+            }
+        }while(loopContinue);
+        
+        Ui.showTeam(playingTeam);
+        Ui.showBoard(playingBoard, false);
+        Ui.showIdentification(currentIdentification);
+        do{
+
+        }while(loopContinue);
     }
 }

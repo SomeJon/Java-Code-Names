@@ -1,8 +1,8 @@
 package engine.board;
 
 public class Postion {
-    private int row;
-    private int col;
+    private final int row;
+    private final int col;
 
     public int getRow() {
         return row;

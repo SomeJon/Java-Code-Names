@@ -6,6 +6,7 @@ import engine.board.card.CardGroup;
 import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
 import engine.data.GameStatus;
+import engine.data.Identification;
 import engine.data.Team;
 import engine.exception.CodeNameExceptions;
 import engine.exception.OutOfBoundException;
@@ -81,7 +82,7 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
     public void addFileData() {
         if(!Data.hasAFile()){
             Menu menu = Data.getMainMenu().getStartMenu();
-            menu.createMenuOption("Show game details.", MenuAction.GAME_STATUS, this);
+            menu.createMenuOption("Show game details.", MenuAction.SHOW_GAME_DATA, this);
             menu.createMenuOption("Start a new game.",
                     MenuAction.START_GAME, this);
 
@@ -94,6 +95,9 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
         Card[][] board = i_ReceivedBoard.getBoard();
         int rows = i_ReceivedBoard.getNumOfRows();
 
+        Menu menu = Data.getMainMenu().getStartMenu();
+        menu.createMenuOption("Play Turn.", MenuAction.PLAYER_TURN, this);
+        menu.createMenuOption("Active Game Status.", MenuAction.GAME_STATUS, this);
         updateBuildingData(i_ReceivedBoard);
         Data.setFirstLines(createLines(board, rows, true, false));
     }
@@ -137,7 +141,7 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
     public void showGameDetails(GameStatus i_ReceivedGameStatus) {
         List<Team> teams = i_ReceivedGameStatus.getTeams();
 
-        System.out.println("Current game details: ");
+        System.out.println("\n*******Current game details*******");
         System.out.println("Current word bank size: " +
                 i_ReceivedGameStatus.getNumOfWords());
         System.out.println("Current black word bank size: " +
@@ -149,8 +153,27 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
 
         teams.forEach(t -> System.out.println("-------------------\nTeam Name: " + t.getName() +
                 "\nWord goal: " + t.getPointGoal()));
-        System.out.println("---------------------\n");
+        System.out.println("---------------------");
 
+        PauseConsole.pause();
+
+    }
+
+    @Override
+    public void showTeam(GroupTeam PlayingTeam) {
+        System.out.println("--------------------------" +
+                "\n" + PlayingTeam.getName() + " Current score " +
+                PlayingTeam.getCards() + "/" + PlayingTeam.getCardsFlipped() +
+                "\n--------------------------");
+    }
+
+    @Override
+    public void showIdentification(Identification i_CurrentIdentification) {
+        if(Data.getNextInput() != InputHandling.GUSSER)
+            Data.setNextInput(InputHandling.GUSSER);
+
+        System.out.println("Identification: " + i_CurrentIdentification.getIdentification() +
+                "\nNumber of related words: " + i_CurrentIdentification.getRelated());
     }
 
     private List<String> createLines(Card[][] i_Board, int i_NumOfRows,
@@ -219,7 +242,6 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
         return returnString.toString();
     }
 
-
     @Override
     public void Notify(Object sender) {
         MenuAction action = (MenuAction) ((MenuItem)sender).getItemValue();
@@ -230,6 +252,9 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
         switch (action){
             case LOAD_XML:
                 Data.setNextInput(InputHandling.FILE_PATH);
+                break;
+            case PLAYER_TURN:
+                Data.setNextInput(InputHandling.IDENTIFICATION);
                 break;
         }
     }

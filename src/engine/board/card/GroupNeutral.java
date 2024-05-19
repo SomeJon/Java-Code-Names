@@ -9,7 +9,7 @@ public class GroupNeutral extends CardGroup{
     }
 
     public GroupNeutral(boolean i_IsBlack, Integer i_NumOfCards) {
-        CardsLeft = i_NumOfCards;
+        Cards = i_NumOfCards;
         IsBlack = i_IsBlack;
     }
 }
