@@ -4,7 +4,8 @@ public abstract class CodeNameExceptions extends RuntimeException {
     public enum ExceptionType {
         LOAD_FILE,
         CHECK_PATH,
-        TURN_EXCEPTION
+        TURN_EXCEPTION,
+        CARD_FLIPPED
     }
 
     private ExceptionType Type;

@@ -1,7 +1,7 @@
 package program;
 
 import engine.Engine;
-import ui.UiAction;
+import ui.veiw.UiAction;
 
 public class Program {
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package ui;
+package ui.veiw;
 
 import engine.board.Board;
 import engine.board.card.Card;
@@ -21,7 +21,7 @@ import ui.interfaces.UiActionConst;
 import java.util.*;
 
 
-public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionConst {
+public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActionConst {
     private UiData Data;
     private MenuAction CurrentChoice;
 
@@ -169,8 +169,8 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
 
     @Override
     public void showIdentification(Identification i_CurrentIdentification) {
-        if(Data.getNextInput() != InputHandling.GUSSER)
-            Data.setNextInput(InputHandling.GUSSER);
+        if(Data.getNextInput() != InputHandling.GUESSER)
+            Data.setNextInput(InputHandling.GUESSER);
 
         System.out.println("Identification: " + i_CurrentIdentification.getIdentification() +
                 "\nNumber of related words: " + i_CurrentIdentification.getRelated());
@@ -183,11 +183,15 @@ public class UiAction implements engine.ui.UiAction, ChoiceNotifier, UiActionCon
         for(int i = 0; i < i_NumOfRows; i++){
             StringBuilder line = new StringBuilder();
             for(Card card : i_Board[i]){
-                if(i_First) {
-                    line.append("|").append(firstCardLine(card));
+                if(card != null) {
+                    if (i_First) {
+                        line.append("|").append(firstCardLine(card));
+                    } else {
+                        line.append("|").append(secondCardLine(card, i_Visible));
+                    }
                 }
                 else{
-                    line.append("|").append(secondCardLine(card, i_Visible));
+                    line.append("|").append(alignString("", Data.getCardLineSize()));
                 }
             }
 

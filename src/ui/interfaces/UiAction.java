@@ -1,4 +1,4 @@
-package engine.ui;
+package ui.interfaces;
 
 import engine.Engine;
 import engine.board.Board;

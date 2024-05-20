@@ -1,4 +1,4 @@
-package ui;
+package ui.veiw;
 
 import menu.console.MainMenu;
 import ui.input.InputHandling;

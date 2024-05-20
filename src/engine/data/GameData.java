@@ -1,10 +1,8 @@
 package engine.data;
 
 import engine.board.Board;
-import engine.board.card.CardGroup;
-import engine.board.card.GroupTeam;
 import engine.exception.loadxml.OutOfBoundLoad;
-import engine.ui.UiAction;
+import ui.interfaces.UiAction;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -55,7 +53,6 @@ public class GameData {
     public void startBoard() {
         Board newBoard = buildBoard(new ArrayList<>(Words), new ArrayList<>(BlackWords),
                 Status, NumOfRows, NumOfColumns);
-        GroupTeam team = newBoard.getGroupTeams().get(0);
-        ActiveData = new ActiveGame(newBoard, team);
+        ActiveData = new ActiveGame(newBoard, newBoard.getGroupTeams());
     }
 }

@@ -34,5 +34,6 @@ public class Card {
 
     public void flip(){
         Flipped = !Flipped;
+        Group.cardDown();
     }
 }

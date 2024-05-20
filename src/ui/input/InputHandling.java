@@ -1,9 +1,10 @@
 package ui.input;
 
+import engine.response.GuesserResponse;
 import engine.response.IdentificationResponse;
 import engine.response.LoadXmlResponse;
 import engine.response.Response;
-import ui.UiAction;
+import ui.veiw.UiAction;
 
 import java.io.File;
 import java.util.InputMismatchException;
@@ -38,10 +39,10 @@ public enum InputHandling {
             System.out.println("Please enter an identification word and number of related words after");
             System.out.print("Identification word: ");
             String identificationWord = scanner.nextLine();
-            System.out.print("Number of related words: ");
             int numberOfRelatedWords = 0;
 
             do {
+                System.out.print("Number of related words: ");
                 try {
                     numberOfRelatedWords = scanner.nextInt();
                     continueLoop = false;
@@ -54,10 +55,25 @@ public enum InputHandling {
             o_Response.loadResponse(new IdentificationResponse(identificationWord, numberOfRelatedWords));
         }
     },
-    GUSSER{
+    GUESSER{
         @Override
         public void getInput(Response o_Response) {
-
+            Scanner scanner = new Scanner(System.in);
+            boolean continueLoop;
+            int CardId = 0;
+            
+            do {
+                System.out.print("Please enter the number of the guessed card, or enter 0 to end guessing: ");
+                try {
+                    CardId = scanner.nextInt();
+                    continueLoop = false;
+                } catch (InputMismatchException e) {
+                    continueLoop = true;
+                    UiAction.errorPrint("Non Number entered! please try again");
+                }
+            } while (continueLoop);
+            
+            o_Response.loadResponse(new GuesserResponse(CardId));
         }
     };
 

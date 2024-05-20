@@ -53,6 +53,11 @@ public class Board {
         return Board;
     }
 
+    public Card getCard(int i_Id){
+        Postion pos = Postion.getPostion(i_Id, NumOfColumns);
+        return Board[pos.getRow()][pos.getCol()];
+    }
+
     public static Board buildBoard(List<String> NormalWords, List<String> BlackWords,
                                    GameStatus BuildData, int NumOfRows, int NumOfColumns) {
         int normalWordCards = BuildData.getNumOfCards();

@@ -1,14 +1,20 @@
 package engine;
 
 import engine.board.Board;
+import engine.board.card.Card;
+import engine.board.card.CardGroup;
+import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
 import engine.data.GameData;
 import engine.data.Identification;
 import engine.exception.CodeNameExceptions;
+import engine.exception.turn.CardFlippedException;
+import engine.exception.turn.GuessOutOfRangeException;
 import engine.exception.turn.IdentificationException;
+import engine.response.GuesserResponse;
 import engine.response.IdentificationResponse;
 import engine.response.LoadXmlResponse;
-import ui.UiAction;
+import ui.veiw.UiAction;
 import jaxb.schema.FileReader;
 
 import java.io.File;
@@ -22,7 +28,7 @@ public class Engine {
         GAME_STATUS,
         CLOSE
     }
-    public enum eGuessResult{
+    public enum GuessResult{
         CorrectTeam,
         WrongTeam,
         BlackWord,
@@ -57,7 +63,7 @@ public class Engine {
                     Ui.updateBoard(Data.getActiveData().getPlayingBoard());
                     break;
                 case PLAYER_TURN:
-                    playTurn();
+                    playTurnIdentification();
                     break;
             }
 
@@ -79,10 +85,10 @@ public class Engine {
         }
     }
 
-    public void playTurn(){
+    private void playTurnIdentification(){
         boolean loopContinue;
         IdentificationResponse response;
-        GroupTeam playingTeam = Data.getActiveData().getPlayingTeamGreoup();
+        GroupTeam playingTeam = Data.getActiveData().getPlayingTeamGroup();
         Board playingBoard = Data.getActiveData().getPlayingBoard();
         Identification currentIdentification = null;
                 
@@ -104,11 +110,84 @@ public class Engine {
             }
         }while(loopContinue);
         
+
+    }
+
+    private void playTurnGuessers(Identification currentIdentification){
+        boolean loopContinue;
+        GuesserResponse response;
+        GroupTeam playingTeam = Data.getActiveData().getPlayingTeamGroup();
+        Board playingBoard = Data.getActiveData().getPlayingBoard();
+        int maxId = Data.getStatus().getNumOfCards() + Data.getStatus().getNumOfBlackCards();
+
         Ui.showTeam(playingTeam);
         Ui.showBoard(playingBoard, false);
-        Ui.showIdentification(currentIdentification);
         do{
-
+            response = new GuesserResponse();
+            Ui.showIdentification(currentIdentification);
+            Ui.getResponse(response);
+            int cardId = response.getCardId();
+            if(cardId < 0 || cardId > maxId) {
+                Ui.exceptionHandler(new GuessOutOfRangeException("Card Id", cardId, maxId, 0));
+                loopContinue = true;
+            }
+            else{
+                Card guessedCard = playingBoard.getCard(cardId);
+                if(guessedCard.isFlipped()) {
+                    Ui.exceptionHandler(new CardFlippedException());
+                    loopContinue = true;
+                }
+                else{
+                    guessedCard.flip();
+                    loopContinue = checkCardReturnContinue(guessedCard);
+                }
+            }
         }while(loopContinue);
+
+        Data.getActiveData().nextTeam();
+    }
+
+    private boolean checkCardReturnContinue(Card i_GuessedCard) {
+        boolean loopContinue;
+        GroupTeam playingTeam = Data.getActiveData().getPlayingTeamGroup();
+        Board playingBoard = Data.getActiveData().getPlayingBoard();
+        CardGroup cardGroup = i_GuessedCard.getGroup();
+
+        if(cardGroup instanceof GroupNeutral) {
+            GroupNeutral NeutralGroup = (GroupNeutral) cardGroup;
+            if (NeutralGroup.isBlack()) {
+                Data.getActiveData().getPlayingTeams().remove(playingTeam.getTeam());
+                if (Data.getActiveData().getPlayingTeams().size() == 1) {
+                    //todo end game, left team wins!
+                } else {
+                    //todo return guess result black
+                }
+            } else {
+                //todo return guess result neutral
+            }
+            loopContinue = false;
+        }
+        else {
+            GroupTeam groupTeam = (GroupTeam) cardGroup;
+            if (groupTeam != playingTeam) {
+                //todo return wrong team result
+                if (groupTeam.getCardsFlipped() == groupTeam.getCards()) {
+                    //todo return victory
+                }
+                loopContinue = false;
+            } else {
+                //todo return correct team
+                if (groupTeam.getCardsFlipped() == groupTeam.getCards()) {
+                    //todo return victory
+                    loopContinue = false;
+                } else {
+                    loopContinue = true;
+                    Ui.showTeam(playingTeam);
+                    Ui.showBoard(playingBoard, false);
+                }
+            }
+        }
+
+        return loopContinue;
     }
 }
