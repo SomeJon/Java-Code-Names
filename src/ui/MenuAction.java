@@ -6,5 +6,6 @@ public enum MenuAction {
     START_GAME,
     PLAYER_TURN,
     GAME_STATUS,
+    SAVE_GAME_DATA,
     CLOSE
 }

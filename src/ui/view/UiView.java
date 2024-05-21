@@ -14,6 +14,8 @@ import engine.exception.CodeNameExceptions;
 import engine.exception.OutOfBoundException;
 import engine.exception.loadxml.OutOfBoundLoad;
 import engine.exception.loadxml.TeamNamesNotUnique;
+import engine.exception.turn.GuessOutOfRangeException;
+import engine.exception.turn.IdentificationException;
 import engine.response.Response;
 import ui.MenuAction;
 import ui.view.input.InputHandling;
@@ -21,10 +23,11 @@ import ui.interfaces.UiActionConst;
 import ui.interfaces.UiViewInterface;
 import ui.menu.console.*;
 
+import java.io.Serializable;
 import java.util.*;
 
 
-public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst {
+public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , Serializable {
     private UiData Data;
     private MenuAction CurrentChoice;
 
@@ -41,12 +44,15 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst {
     @Override
     public MenuAction openMenu() {
         MainMenu MainMenu = Data.getMainMenu();
+        Menu menu = MainMenu.getStartMenu();
 
+        menu.createMenuOption(Data.menuSaveText(), MenuAction.SAVE_GAME_DATA, this);
         System.out.println();
         MainMenu.play();
         if(MainMenu.isClosing())
             CurrentChoice = MenuAction.CLOSE;
         System.out.println();
+        menu.getMenuItems().remove(menu.getMenuItems().size()-1);
 
         return CurrentChoice;
 
@@ -120,6 +126,12 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst {
                 break;
             case CHECK_PATH:
                 System.out.println("The error occurred while checking the path,");
+                break;
+            case TURN_EXCEPTION:
+                System.out.println("The error occurred while during a turn,");
+                break;
+            case CARD_FLIPPED:
+                System.out.println("Error occurred because the card was already flipped.");
         }
 
         if(i_ReceivedError instanceof OutOfBoundException){
@@ -127,6 +139,12 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst {
             System.out.println("Error is the result of ");
             if(Received instanceof OutOfBoundLoad){
                 System.out.print("the logic in file, ");
+            }
+            if(Received instanceof GuessOutOfRangeException){
+                System.out.println("card if being out of range, ");
+            }
+            if(Received instanceof IdentificationException){
+                System.out.println("trying to give the option to flip more cards then possible for the team, ");
             }
 
             System.out.println("Entered " + Received.getParameterName() + " with value " +
@@ -329,6 +347,9 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst {
                 break;
             case PLAYER_TURN:
                 Data.setNextInput(InputHandling.IDENTIFICATION);
+                break;
+            case SAVE_GAME_DATA:
+                Data.flipSave();
                 break;
         }
     }

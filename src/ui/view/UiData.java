@@ -4,10 +4,11 @@ import ui.menu.console.MainMenu;
 import ui.view.input.InputHandling;
 import ui.interfaces.UiActionConst;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-public class UiData implements UiActionConst {
+public class UiData implements UiActionConst, Serializable {
     private MainMenu MainMenu;
     private int CardLineSize;
     private int LineSize;
@@ -15,7 +16,13 @@ public class UiData implements UiActionConst {
     private String ClosingLine;
     private boolean LoadedAFile = false;
     private boolean ActiveGame;
+    private boolean SaveOnExit = false;
     private InputHandling NextInput;
+
+
+    public void flipSave(){
+        SaveOnExit = !SaveOnExit;
+    }
 
     public boolean isActiveGame() {
         return ActiveGame;
@@ -80,5 +87,18 @@ public class UiData implements UiActionConst {
 
     public UiData() {
         MainMenu = new MainMenu("Code Names: Main Menu");
+    }
+
+    public String menuSaveText(){
+        String text = MENU_SAVE + ": ";
+
+        if(SaveOnExit){
+            text = text + MENU_ON;
+        }
+        else{
+            text = text + MENU_OFF;
+        }
+
+        return text;
     }
 }

@@ -25,6 +25,7 @@ public class Controller {
     public static int EndGuessId = 0;
     private final UiViewInterface Ui;
     private final EngineInterface Engine;
+    private boolean SaveGameExit = false;
 
     public void Start(){
         MenuAction menuAction;
@@ -48,6 +49,8 @@ public class Controller {
                     break;
                 case GAME_STATUS:
                     gameStatus();
+                case SAVE_GAME_DATA:
+                    SaveGameExit = !SaveGameExit;
             }
 
         }while(menuAction != MenuAction.CLOSE);
