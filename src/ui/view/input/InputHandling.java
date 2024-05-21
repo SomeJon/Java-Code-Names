@@ -1,9 +1,11 @@
-package ui.input;
+package ui.view.input;
 
+import engine.response.GuesserResponse;
 import engine.response.IdentificationResponse;
 import engine.response.LoadXmlResponse;
 import engine.response.Response;
-import ui.UiAction;
+import ui.Controller;
+import ui.view.UiView;
 
 import java.io.File;
 import java.util.InputMismatchException;
@@ -21,9 +23,9 @@ public enum InputHandling {
             File file = new File(path);
 
             if (!file.isFile()) {
-                UiAction.errorPrint("A file was not found at the given path!");
+                UiView.errorPrint("A file was not found at the given path!");
             } else if (!path.endsWith(".xml")) {
-                UiAction.errorPrint("File path does not lead to an xml file!");
+                UiView.errorPrint("File path does not lead to an xml file!");
             } else {
                 o_Response.loadResponse(new LoadXmlResponse(file));
             }
@@ -38,26 +40,45 @@ public enum InputHandling {
             System.out.println("Please enter an identification word and number of related words after");
             System.out.print("Identification word: ");
             String identificationWord = scanner.nextLine();
-            System.out.print("Number of related words: ");
             int numberOfRelatedWords = 0;
 
             do {
+                System.out.print("Number of related words: ");
                 try {
                     numberOfRelatedWords = scanner.nextInt();
                     continueLoop = false;
                 } catch (InputMismatchException e) {
                     continueLoop = true;
-                    UiAction.errorPrint("Non Number entered! please try again");
+                    scanner.nextLine();
+                    UiView.errorPrint("Non Number entered! please try again");
                 }
             } while (continueLoop);
 
             o_Response.loadResponse(new IdentificationResponse(identificationWord, numberOfRelatedWords));
         }
     },
-    GUSSER{
+    GUESSER{
         @Override
         public void getInput(Response o_Response) {
+            Scanner scanner = new Scanner(System.in);
+            boolean continueLoop;
+            int CardId = 0;
+            
+            do {
+                System.out.print("Please enter the number of the guessed card, or enter " +
+                        Controller.EndGuessId + " to end guessing: ");
+                try {
+                    CardId = scanner.nextInt();
+                    continueLoop = false;
+                } catch (InputMismatchException e) {
+                    continueLoop = true;
+                    scanner.nextLine();
+                    UiView.errorPrint("Non Number entered! please try again");
+                }
+            } while (continueLoop);
 
+            System.out.println();
+            o_Response.loadResponse(new GuesserResponse(CardId));
         }
     };
 

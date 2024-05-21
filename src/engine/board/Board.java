@@ -1,7 +1,7 @@
 package engine.board;
 
 import engine.board.card.Card;
-import engine.board.card.CardGroup;
+import engine.board.card.GroupCard;
 import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
 import engine.data.GameStatus;
@@ -13,13 +13,11 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Board {
-    private boolean Visible;
     private final int NumOfColumns;
     private final int NumOfRows;
     private Card[][] Board;
-    private final List<CardGroup> CardGroups;
+    private final List<GroupCard> CardGroups;
     private final List<GroupTeam> GroupTeams;
-    private List<Card> test;
 
 
     private Board(Integer numOfRows, Integer numOfColumns) {
@@ -29,28 +27,29 @@ public class Board {
         GroupTeams = new ArrayList<>();
     }
 
-    public List<GroupTeam> getGroupTeams() {
-        return GroupTeams;
-    }
-
     public int getNumOfColumns() {
         return NumOfColumns;
+    }
+
+    public List<GroupTeam> getGroupTeams() {
+        return GroupTeams;
     }
 
     public int getNumOfRows() {
         return NumOfRows;
     }
 
-    public int getBoardSize(){
-        return NumOfRows * NumOfColumns;
-    }
-
-    public List<CardGroup> getCardGroups() {
+    public List<GroupCard> getCardGroups() {
         return CardGroups;
     }
 
     public Card[][] getBoard() {
         return Board;
+    }
+
+    public Card getCard(int i_Id){
+        Postion pos = Postion.getPostion(i_Id, NumOfColumns);
+        return Board[pos.getRow()][pos.getCol()];
     }
 
     public static Board buildBoard(List<String> NormalWords, List<String> BlackWords,
@@ -75,7 +74,7 @@ public class Board {
             }
         }
 
-        CardGroup groupNeutral = new GroupNeutral(false, (normalWordCards - index));
+        GroupCard groupNeutral = new GroupNeutral(false, (normalWordCards - index));
         returnedBoard.CardGroups.add(groupNeutral);
         int normalWords = normalWordCards - index;
         for (int i = 0; i < normalWords; i++) {
@@ -83,7 +82,7 @@ public class Board {
             index++;
         }
 
-        CardGroup groupBlack = new GroupNeutral(true, (normalWordCards - index));
+        GroupCard groupBlack = new GroupNeutral(true, (normalWordCards - index));
         returnedBoard.CardGroups.add(groupBlack);
         ChosenBlackWords
                 .forEach(s -> cardsList.add(new Card(s, groupBlack)));

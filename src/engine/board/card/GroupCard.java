@@ -1,7 +1,7 @@
 package engine.board.card;
 
 
-public abstract class CardGroup {
+public abstract class GroupCard{
     protected int Cards;
     protected int CardsFlipped = 0;
 
@@ -16,4 +16,6 @@ public abstract class CardGroup {
     public void cardDown(){
         CardsFlipped++;
     }
+
+    public abstract GroupCard getCopy();
 }

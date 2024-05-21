@@ -50,13 +50,13 @@ public class GameStatus {
             throw new TeamNamesNotUnique(teamNames);
         }
         if(numOfWords < numOfCards){
-            throw new OutOfBoundLoad("Cards", numOfCards, numOfWords, 0);
+            throw new OutOfBoundLoad("Cards amount", numOfCards, numOfWords, 0);
         }
         if(numOfBlackWords < numOfBlackCards){
-            throw new OutOfBoundLoad("Black Cards", numOfBlackCards, numOfBlackWords, 0);
+            throw new OutOfBoundLoad("Black Cards amount", numOfBlackCards, numOfBlackWords, 0);
         }
         if(numOfCards < sumOfTeamCards){
-            throw  new OutOfBoundLoad("Team Cards", sumOfTeamCards, numOfCards, 0);
+            throw  new OutOfBoundLoad("Team Cards amount", sumOfTeamCards, numOfCards, 0);
         }
 
         Teams = teams;

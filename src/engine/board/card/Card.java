@@ -5,13 +5,13 @@ public class Card {
     private boolean Flipped = false;
     private final String Text;
     private Integer ID;
-    private final CardGroup Group;
+    private final GroupCard Group;
 
     public String getText() {
         return Text;
     }
 
-    public CardGroup getGroup() {
+    public GroupCard getGroup() {
         return Group;
     }
 
@@ -23,16 +23,24 @@ public class Card {
         return ID;
     }
 
-    public void setID(Integer ID) {
-        this.ID = ID;
+    public void setID(Integer i_ID) {
+        this.ID = i_ID;
     }
 
-    public Card(String text, CardGroup group) {
-        Text = text;
-        Group = group;
+    public Card(String i_Text, GroupCard i_Group) {
+        Text = i_Text;
+        Group = i_Group;
+    }
+
+    public Card(String i_Text, GroupCard i_Group, int i_Id, boolean i_isFlipped) {
+        Text = i_Text;
+        Group = i_Group;
+        setID(i_Id);
+        Flipped = i_isFlipped;
     }
 
     public void flip(){
         Flipped = !Flipped;
+        Group.cardDown();
     }
 }
