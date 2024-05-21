@@ -1,7 +1,8 @@
 package program;
 
 import engine.Engine;
-import ui.veiw.UiAction;
+import ui.Controller;
+import ui.view.UiView;
 
 public class Program {
     public static void main(String[] args) {
@@ -9,9 +10,10 @@ public class Program {
     }
 
     public static void Run(){
-        UiAction gameUi = new UiAction();
-        Engine gameEngine = new Engine(gameUi);
+        UiView gameUi = new UiView();
+        Engine gameEngine = new Engine();
+        Controller codeNameController = new Controller(gameUi, gameEngine);
 
-        gameEngine.startGame();
+        codeNameController.Start();
     }
 }

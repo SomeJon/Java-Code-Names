@@ -1,4 +1,4 @@
-package menu.console;
+package ui.menu.console;
 
 public class MenuItem {
     private final String ItemText;

@@ -1,10 +1,11 @@
-package ui.input;
+package ui.view.input;
 
 import engine.response.GuesserResponse;
 import engine.response.IdentificationResponse;
 import engine.response.LoadXmlResponse;
 import engine.response.Response;
-import ui.veiw.UiAction;
+import ui.Controller;
+import ui.view.UiView;
 
 import java.io.File;
 import java.util.InputMismatchException;
@@ -22,9 +23,9 @@ public enum InputHandling {
             File file = new File(path);
 
             if (!file.isFile()) {
-                UiAction.errorPrint("A file was not found at the given path!");
+                UiView.errorPrint("A file was not found at the given path!");
             } else if (!path.endsWith(".xml")) {
-                UiAction.errorPrint("File path does not lead to an xml file!");
+                UiView.errorPrint("File path does not lead to an xml file!");
             } else {
                 o_Response.loadResponse(new LoadXmlResponse(file));
             }
@@ -48,7 +49,8 @@ public enum InputHandling {
                     continueLoop = false;
                 } catch (InputMismatchException e) {
                     continueLoop = true;
-                    UiAction.errorPrint("Non Number entered! please try again");
+                    scanner.nextLine();
+                    UiView.errorPrint("Non Number entered! please try again");
                 }
             } while (continueLoop);
 
@@ -63,16 +65,19 @@ public enum InputHandling {
             int CardId = 0;
             
             do {
-                System.out.print("Please enter the number of the guessed card, or enter 0 to end guessing: ");
+                System.out.print("Please enter the number of the guessed card, or enter " +
+                        Controller.EndGuessId + " to end guessing: ");
                 try {
                     CardId = scanner.nextInt();
                     continueLoop = false;
                 } catch (InputMismatchException e) {
                     continueLoop = true;
-                    UiAction.errorPrint("Non Number entered! please try again");
+                    scanner.nextLine();
+                    UiView.errorPrint("Non Number entered! please try again");
                 }
             } while (continueLoop);
-            
+
+            System.out.println();
             o_Response.loadResponse(new GuesserResponse(CardId));
         }
     };

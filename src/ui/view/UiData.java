@@ -1,7 +1,7 @@
-package ui.veiw;
+package ui.view;
 
-import menu.console.MainMenu;
-import ui.input.InputHandling;
+import ui.menu.console.MainMenu;
+import ui.view.input.InputHandling;
 import ui.interfaces.UiActionConst;
 
 import java.util.Collections;
@@ -14,7 +14,16 @@ public class UiData implements UiActionConst {
     private List<String> FirstLines;
     private String ClosingLine;
     private boolean LoadedAFile = false;
+    private boolean ActiveGame;
     private InputHandling NextInput;
+
+    public boolean isActiveGame() {
+        return ActiveGame;
+    }
+
+    public void flipActiveGame() {
+        ActiveGame = !ActiveGame;
+    }
 
     public InputHandling getNextInput() {
         return NextInput;

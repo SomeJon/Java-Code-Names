@@ -1,11 +1,13 @@
-package ui.veiw;
+package ui.view;
 
-import engine.board.Board;
+import dto.type.board.DtoBoard;
+import dto.type.data.DtoActiveGameStatus;
+import dto.type.data.DtoGameDetails;
+import dto.type.data.DtoGuessResult;
 import engine.board.card.Card;
-import engine.board.card.CardGroup;
+import engine.board.card.GroupCard;
 import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
-import engine.data.GameStatus;
 import engine.data.Identification;
 import engine.data.Team;
 import engine.exception.CodeNameExceptions;
@@ -13,19 +15,20 @@ import engine.exception.OutOfBoundException;
 import engine.exception.loadxml.OutOfBoundLoad;
 import engine.exception.loadxml.TeamNamesNotUnique;
 import engine.response.Response;
-import menu.console.*;
-import engine.Engine.MenuAction;
-import ui.input.InputHandling;
+import ui.MenuAction;
+import ui.view.input.InputHandling;
 import ui.interfaces.UiActionConst;
+import ui.interfaces.UiViewInterface;
+import ui.menu.console.*;
 
 import java.util.*;
 
 
-public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActionConst {
+public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst {
     private UiData Data;
     private MenuAction CurrentChoice;
 
-    public UiAction() {
+    public UiView() {
         Data = new UiData();
     }
 
@@ -39,16 +42,18 @@ public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActio
     public MenuAction openMenu() {
         MainMenu MainMenu = Data.getMainMenu();
 
+        System.out.println();
         MainMenu.play();
         if(MainMenu.isClosing())
             CurrentChoice = MenuAction.CLOSE;
+        System.out.println();
 
         return CurrentChoice;
+
     }
 
-
     @Override
-    public void showBoard(Board i_ReceivedBoard, boolean i_Visible) {
+    public void showBoard(DtoBoard i_ReceivedBoard, boolean i_Visible) {
         Card[][] board = i_ReceivedBoard.getBoard();
         int rows = i_ReceivedBoard.getNumOfRows();
         List<String> secondLines;
@@ -68,7 +73,7 @@ public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActio
         try {
             Data.getNextInput().getInput(o_Response);
         } catch (CodeNameExceptions e) {
-            this.exceptionHandler(e);
+            this.exceptionHandler(e, false);
         }
     }
 
@@ -91,19 +96,22 @@ public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActio
     }
 
     @Override
-    public void updateBoard(Board i_ReceivedBoard) {
+    public void updateBoard(DtoBoard i_ReceivedBoard) {
         Card[][] board = i_ReceivedBoard.getBoard();
         int rows = i_ReceivedBoard.getNumOfRows();
 
-        Menu menu = Data.getMainMenu().getStartMenu();
-        menu.createMenuOption("Play Turn.", MenuAction.PLAYER_TURN, this);
-        menu.createMenuOption("Active Game Status.", MenuAction.GAME_STATUS, this);
+        if(!Data.isActiveGame()) {
+            Data.flipActiveGame();
+            Menu menu = Data.getMainMenu().getStartMenu();
+            menu.createMenuOption("Play Turn.", MenuAction.PLAYER_TURN, this);
+            menu.createMenuOption("Active Game Status.", MenuAction.GAME_STATUS, this);
+        }
         updateBuildingData(i_ReceivedBoard);
         Data.setFirstLines(createLines(board, rows, true, false));
     }
 
     @Override
-    public void exceptionHandler(CodeNameExceptions i_ReceivedError) {
+    public void exceptionHandler(CodeNameExceptions i_ReceivedError, boolean i_TryAgain) {
         System.out.println("\n!!!An error occurred!!!");
 
         switch(i_ReceivedError.getType()){
@@ -121,7 +129,7 @@ public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActio
                 System.out.print("the logic in file, ");
             }
 
-            System.out.println("Entered " + Received.getMessage() + " with value " +
+            System.out.println("Entered " + Received.getParameterName() + " with value " +
                     Received.getParameterValue() + " while expected value to be in range: (" +
                     Received.getMin() + " - " + Received.getMax() + ")");
         }
@@ -134,11 +142,15 @@ public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActio
             .forEach(s -> System.out.print(" \"" + s + "\","));
         }
 
+        if(i_TryAgain){
+            System.out.println("Please try again.");
+        }
+
         System.out.println("!!!!!!\n");
     }
 
     @Override
-    public void showGameDetails(GameStatus i_ReceivedGameStatus) {
+    public void showGameDetails(DtoGameDetails i_ReceivedGameStatus) {
         List<Team> teams = i_ReceivedGameStatus.getTeams();
 
         System.out.println("\n*******Current game details*******");
@@ -148,7 +160,7 @@ public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActio
                 i_ReceivedGameStatus.getNumOfBlackWords());
         System.out.println("Participating Words: (Normal:" +
                 i_ReceivedGameStatus.getNumOfCards() +
-                ") (Black:" + i_ReceivedGameStatus.getNumOfBlackWords()
+                ") (Black:" + i_ReceivedGameStatus.getNumOfBlackCards()
                 +")");
 
         teams.forEach(t -> System.out.println("-------------------\nTeam Name: " + t.getName() +
@@ -156,14 +168,13 @@ public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActio
         System.out.println("---------------------");
 
         PauseConsole.pause();
-
     }
 
     @Override
-    public void showTeam(GroupTeam PlayingTeam) {
+    public void showTeam(GroupTeam i_PlayingTeam) {
         System.out.println("--------------------------" +
-                "\n" + PlayingTeam.getName() + " Current score " +
-                PlayingTeam.getCards() + "/" + PlayingTeam.getCardsFlipped() +
+                "\n" + i_PlayingTeam.getName() + " Current score " +
+                i_PlayingTeam.getCardsFlipped() + "/" + i_PlayingTeam.getCards() +
                 "\n--------------------------");
     }
 
@@ -174,6 +185,65 @@ public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActio
 
         System.out.println("Identification: " + i_CurrentIdentification.getIdentification() +
                 "\nNumber of related words: " + i_CurrentIdentification.getRelated());
+    }
+
+    @Override
+    public void guessResult(DtoGuessResult i_ReceivedGuessResult, int i_GuessLeft, GroupTeam i_CurrentTeam) {
+        System.out.println("You flipped a Card!");
+        switch(i_ReceivedGuessResult){
+            case SUCCESSFUL_GUESS:
+                System.out.println("The card belonged to your team, and received a point!");
+                i_CurrentTeam.cardDown();
+                if(i_GuessLeft > 0){
+                    System.out.println("You can guess " + i_GuessLeft + " more times!");
+                }
+                else{
+                    System.out.println("No guesses left! Turn Ends");
+                }
+                break;
+            case ENEMY_TEAM_HIT:
+                GroupTeam enemyTeam = i_ReceivedGuessResult.getGroupTeam().getPlayingTeam();
+                System.out.println("The card belonged to an enemy Team!" +
+                        "\n" + enemyTeam.getName() + " Received a point!" +
+                        "\n\nTurn Ends");
+                break;
+            case BLACK_HIT:
+                GroupTeam teamLost = i_ReceivedGuessResult.getGroupTeam().getPlayingTeam();
+                System.out.println("Black card was flipped!" +
+                        "\n" + teamLost + " Lost the game!");
+            case NEUTRAL_HIT:
+                System.out.println("Card flipped was neutral!" +
+                        "\n\nTurn Ends");
+        }
+
+        showTeam(i_CurrentTeam);
+        System.out.println();
+        PauseConsole.pause();
+    }
+
+    @Override
+    public void victoryHandler(GroupTeam i_WinnerTeam) {
+        Menu menu = Data.getMainMenu().getStartMenu();
+        int sizeOfMenu = menu.getMenuItems().size();
+
+        menu.getMenuItems().remove(sizeOfMenu - 1);
+        menu.getMenuItems().remove(sizeOfMenu - 2);
+        Data.flipActiveGame();
+        System.out.println("Game Ended!" +
+                "\nThe winning team is - " + i_WinnerTeam.getName());
+    }
+
+    @Override
+    public void showActiveGameStatus(DtoActiveGameStatus i_Data) {
+        DtoBoard board = i_Data.getBoard();
+        List<GroupTeam> groupTeams = board.getGroupTeams();
+        GroupTeam currentGroupTeam = i_Data.getNextPlayingTeam();
+
+        System.out.println("Board:");
+        showBoard(board, true);
+        System.out.println("Teams in game:");
+        groupTeams.forEach(this::showTeam);
+        System.out.println("Team playing next turn: " + currentGroupTeam.getName());
     }
 
     private List<String> createLines(Card[][] i_Board, int i_NumOfRows,
@@ -211,7 +281,7 @@ public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActio
         String text;
         String groupName;
 
-        CardGroup group = i_Card.getGroup();
+        GroupCard group = i_Card.getGroup();
 
         if(group instanceof GroupTeam){
             groupName = "(" + ((GroupTeam)group).getName() + ")";
@@ -263,11 +333,11 @@ public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActio
         }
     }
 
-    private void updateBuildingData(Board i_RecivedBoard) {
-        Card[][] cardMatrix = i_RecivedBoard.getBoard();
+    private void updateBuildingData(DtoBoard i_ReceivedBoard) {
+        Card[][] cardMatrix = i_ReceivedBoard.getBoard();
         int maxWordSize = getMaxWordLengthInCards(cardMatrix);
-        int maxIdDigits = ((Integer)i_RecivedBoard.getBoardSize()).toString().length();
-        int maxTeamName = getMaxTeamName(i_RecivedBoard.getCardGroups());
+        int maxIdDigits = ((Integer)i_ReceivedBoard.getBoardSize()).toString().length();
+        int maxTeamName = getMaxTeamName(i_ReceivedBoard.getCardGroups());
         int maxLineIdentification;
         int maxLineLength;
 
@@ -275,7 +345,7 @@ public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActio
                 + IDENTIFICATION_LINE_ADDONS_SIZE + maxIdDigits;
         maxLineLength = Integer.max(maxLineIdentification, maxWordSize);
 
-        Data.setCardLineSize(maxLineLength, i_RecivedBoard.getNumOfColumns());
+        Data.setCardLineSize(maxLineLength, i_ReceivedBoard.getNumOfColumns());
     }
 
     private int getMaxWordLengthInCards(Card[][] i_CardMatrix) {
@@ -296,7 +366,7 @@ public class UiAction implements ui.interfaces.UiAction, ChoiceNotifier, UiActio
         return maxWordSize;
     }
 
-    private Integer getMaxTeamName(List<CardGroup> i_CardGroup) {
+    private Integer getMaxTeamName(List<GroupCard> i_CardGroup) {
         return i_CardGroup.stream()
                 .filter(c -> c instanceof GroupTeam)
                 .map(GroupTeam.class::cast)

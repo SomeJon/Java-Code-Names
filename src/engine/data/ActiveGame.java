@@ -29,11 +29,24 @@ public class ActiveGame {
         PlayingTeams = new ArrayList<GroupTeam>(i_PlayingTeams);
     }
 
-    public void nextTeam(){
+    public GroupTeam nextTeam(){
+        PlayingTeamGroup = getNextTeam();
+
+        return PlayingTeamGroup;
+    }
+
+    public void endCurrentTeam(){
+        GroupTeam toRemove = PlayingTeamGroup;
+
+        nextTeam();
+        PlayingTeams.remove(toRemove);
+    }
+
+    public GroupTeam getNextTeam(){
         int currentTeamIndex = PlayingTeams.indexOf(PlayingTeamGroup);
         int numberOfTeams = PlayingTeams.size();
         int nextTeamIndex = (currentTeamIndex + 1) % numberOfTeams;
 
-        PlayingTeamGroup = PlayingTeams.get(nextTeamIndex);
+        return PlayingTeams.get(nextTeamIndex);
     }
 }

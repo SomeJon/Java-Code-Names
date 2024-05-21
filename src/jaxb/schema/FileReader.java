@@ -45,14 +45,12 @@ public class FileReader {
 
     private static GameStatus loadStatus(ECNGame gameData, int NormalWordsAmount, int BlackWordsAmount) {
         List<Team> Teams = new ArrayList<Team>();
-            Team team = new Team(gameData.getECNTeam1().getName(), gameData.getECNTeam1().getCardsCount());
-            Teams.add(team);
-            team = new Team(gameData.getECNTeam2().getName(), gameData.getECNTeam2().getCardsCount());
-            Teams.add(team);
+        Team team = new Team(gameData.getECNTeam1().getName(), gameData.getECNTeam1().getCardsCount());
+        Teams.add(team);
+        team = new Team(gameData.getECNTeam2().getName(), gameData.getECNTeam2().getCardsCount());
+        Teams.add(team);
 
-
-
-            return new GameStatus(Teams, NormalWordsAmount, BlackWordsAmount,
-                    gameData.getECNBoard().getCardsCount(), gameData.getECNBoard().getBlackCardsCount());
+        return new GameStatus(Teams, NormalWordsAmount, BlackWordsAmount,
+                gameData.getECNBoard().getCardsCount(), gameData.getECNBoard().getBlackCardsCount());
     }
 }

@@ -2,7 +2,7 @@ package engine.data;
 
 import engine.board.Board;
 import engine.exception.loadxml.OutOfBoundLoad;
-import ui.interfaces.UiAction;
+import ui.interfaces.UiViewInterface;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -10,7 +10,6 @@ import java.util.Set;
 import static engine.board.Board.buildBoard;
 
 public class GameData {
-    private final UiAction UserInterface;
     private Set<String> Words = null;
     private Set<String> BlackWords = null;
     private int NumOfColumns;
@@ -18,13 +17,6 @@ public class GameData {
     private ActiveGame ActiveData = null;
     private GameStatus Status = null;
 
-    public UiAction getUiAction() {
-        return UserInterface;
-    }
-
-    public GameData(UiAction i_UserInterface) {
-        UserInterface = i_UserInterface;
-    }
 
     public ActiveGame getActiveData() {
         return ActiveData;
