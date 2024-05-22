@@ -49,13 +49,19 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
         MainMenu MainMenu = Data.getMainMenu();
         Menu menu = MainMenu.getStartMenu();
 
-        menu.createMenuOption(Data.menuSaveText(), MenuAction.SAVE_GAME_DATA, this);
+        if(Data.hasAFile()) {
+            menu.createMenuOption(MENU_SAVE, MenuAction.SAVE_GAME_DATA, this);
+        }
+        menu.createMenuOption(MENU_LOAD, MenuAction.LOAD_GAME_DATA, this);
         System.out.println();
         MainMenu.play();
         if(MainMenu.isClosing())
             CurrentChoice = MenuAction.CLOSE;
         System.out.println();
-        menu.getMenuItems().remove(menu.getMenuItems().size()-1);
+        if(Data.hasAFile()) {
+            menu.getMenuItems().remove(menu.getMenuItems().size() - 1);
+        }
+        menu.getMenuItems().remove(menu.getMenuItems().size() - 1);
 
         return CurrentChoice;
 
@@ -348,13 +354,14 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
 
         switch (action){
             case LOAD_XML:
-                Data.setNextInput(InputHandling.FILE_PATH);
+                Data.setNextInput(InputHandling.FILE_PATH_XML);
                 break;
             case PLAYER_TURN:
                 Data.setNextInput(InputHandling.IDENTIFICATION);
                 break;
             case SAVE_GAME_DATA:
-                Data.flipSave();
+            case LOAD_GAME_DATA:
+                Data.setNextInput(InputHandling.FILE_PATH_SAVE);
                 break;
         }
     }

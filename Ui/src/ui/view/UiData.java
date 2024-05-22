@@ -16,7 +16,6 @@ public class UiData implements UiActionConst, Serializable {
     private String ClosingLine;
     private boolean LoadedAFile = false;
     private boolean ActiveGame;
-    private boolean SaveOnExit = false;
     private boolean MenuBuilt = false;
     private InputHandling NextInput;
 
@@ -27,10 +26,6 @@ public class UiData implements UiActionConst, Serializable {
 
     public boolean isMenuBuilt() {
         return MenuBuilt;
-    }
-
-    public void flipSave(){
-        SaveOnExit = !SaveOnExit;
     }
 
     public boolean isActiveGame() {
@@ -96,18 +91,5 @@ public class UiData implements UiActionConst, Serializable {
 
     public UiData() {
         MainMenu = new MainMenu("Code Names: Main Menu");
-    }
-
-    public String menuSaveText(){
-        String text = MENU_SAVE + ": ";
-
-        if(SaveOnExit){
-            text = text + MENU_ON;
-        }
-        else{
-            text = text + MENU_OFF;
-        }
-
-        return text;
     }
 }

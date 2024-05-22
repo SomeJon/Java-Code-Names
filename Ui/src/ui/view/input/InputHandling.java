@@ -5,6 +5,7 @@ import engine.response.IdentificationResponse;
 import engine.response.LoadXmlResponse;
 import engine.response.Response;
 import ui.Controller;
+import ui.save.FileLocationResponse;
 import ui.view.UiView;
 
 import java.io.File;
@@ -12,7 +13,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public enum InputHandling {
-    FILE_PATH{
+    FILE_PATH_XML {
         @Override
         public void getInput(Response o_Response) {
             Scanner scanner = new Scanner(System.in);
@@ -29,6 +30,18 @@ public enum InputHandling {
             } else {
                 o_Response.loadResponse(new LoadXmlResponse(file));
             }
+        }
+    },
+    FILE_PATH_SAVE{
+        @Override
+        public void getInput(Response o_Response) {
+            Scanner scanner = new Scanner(System.in);
+
+            System.out.print("Enter a full file path, include the name of the file: ");
+            String path = scanner.nextLine();
+            path = path + ".cd";
+
+            o_Response.loadResponse(new FileLocationResponse(path));
         }
     },
     IDENTIFICATION{

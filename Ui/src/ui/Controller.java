@@ -15,20 +15,24 @@ import engine.response.IdentificationResponse;
 import engine.response.LoadXmlResponse;
 import engine.response.Response;
 import ui.interfaces.UiViewInterface;
+import ui.save.FileLocationResponse;
+import ui.save.SaveObject;
+import ui.view.UiView;
 
-import java.io.Serializable;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 
-public class Controller implements Serializable {
+
+public class Controller{
     public static int EndGuessId = 0;
-    private final UiViewInterface Ui;
-    private final EngineInterface Engine;
-    private boolean SaveGameExit = false;
+    private UiViewInterface Ui;
+    private EngineInterface Engine;
 
-    public boolean isSaveGameExit() {
-        return SaveGameExit;
-    }
 
-    public boolean Start(){
+    public void Start(){
         MenuAction menuAction;
         Ui.buildStartingMenu();
 
@@ -50,13 +54,22 @@ public class Controller implements Serializable {
                     break;
                 case GAME_STATUS:
                     gameStatus();
+                    break;
                 case SAVE_GAME_DATA:
-                    SaveGameExit = !SaveGameExit;
+                    try {
+                        saveGame();
+                    }
+                    catch (IOException e){
+                        UiView.errorPrint("Error while trying to save file");
+                    }
+                    break;
+                case LOAD_GAME_DATA:
+                    loadGame();
+                    break;
+
             }
 
         }while(menuAction != MenuAction.CLOSE);
-
-        return SaveGameExit;
     }
 
     public Controller(UiViewInterface view, EngineInterface engine) {
@@ -181,5 +194,56 @@ public class Controller implements Serializable {
 
     private void gameStatus(){
         Ui.showActiveGameStatus(Engine.getActiveGameStatus());
+    }
+
+    private void saveGame() throws IOException {
+        FileLocationResponse response = new FileLocationResponse();
+        Ui.getResponse(response);
+
+        if(!response.receivedResponse()){
+            UiView.errorPrint("No file path was given!");
+        }
+        else{
+            String fileName = response.getFileLocation();
+            Path path = Paths.get(fileName);
+            SaveObject toSave = new SaveObject(Ui, Engine);
+            try (ObjectOutputStream out =
+                new ObjectOutputStream(
+                        Files.newOutputStream(path))) {
+                out.writeObject(toSave);
+                out.flush();
+            }
+        }
+    }
+
+    private void loadGame(){
+        FileLocationResponse response = new FileLocationResponse();
+        SaveObject load;
+        Ui.getResponse(response);
+
+        if(!response.receivedResponse()){
+            UiView.errorPrint("No file path was given!");
+        } else {
+            String fileName = response.getFileLocation();
+            Path path = Paths.get(fileName);
+
+            if(Files.exists(path)) {
+                if (!path.endsWith(".xml")) {
+                    UiView.errorPrint("File is of incorrect type!");
+                }
+                try (ObjectInputStream in =
+                             new ObjectInputStream(
+                                     Files.newInputStream(path))) {
+                    load = (SaveObject) in.readObject();
+                    Engine = load.getEngine();
+                    Ui = load.getUi();
+                } catch (IOException | ClassNotFoundException e) {
+                    UiView.errorPrint("File is corrupted");
+                }
+            }
+            else{
+                UiView.errorPrint("No file was found");
+            }
+        }
     }
 }
