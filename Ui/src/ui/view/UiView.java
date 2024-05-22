@@ -10,7 +10,7 @@ import engine.board.card.GroupNeutral;
 import engine.board.card.GroupTeam;
 import engine.data.Identification;
 import engine.data.Team;
-import engine.exception.CodeNameExceptions;
+import engine.exception.CodeNameException;
 import engine.exception.OutOfBoundException;
 import engine.exception.loadxml.OutOfBoundLoad;
 import engine.exception.loadxml.TeamNamesNotUnique;
@@ -87,7 +87,7 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
     public void getResponse(Response o_Response) {
         try {
             Data.getNextInput().getInput(o_Response);
-        } catch (CodeNameExceptions e) {
+        } catch (CodeNameException e) {
             this.exceptionHandler(e, false);
         }
     }
@@ -108,6 +108,7 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
 
             Data.fileLoaded();
         }
+        this.successLoad();
     }
 
     @Override
@@ -126,7 +127,7 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
     }
 
     @Override
-    public void exceptionHandler(CodeNameExceptions i_ReceivedError, boolean i_TryAgain) {
+    public void exceptionHandler(CodeNameException i_ReceivedError, boolean i_TryAgain) {
         System.out.println("\n!!!An error occurred!!!");
 
         switch(i_ReceivedError.getType()){
@@ -215,12 +216,12 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
     }
 
     @Override
-    public void guessResult(DtoGuessResult i_ReceivedGuessResult, int i_GuessLeft, GroupTeam i_CurrentTeam) {
+    public void guessResult(DtoGuessResult i_ReceivedGuessResult, int i_GuessLeft, GroupTeam i_PlayingTeam) {
         System.out.println("You flipped a Card!");
         switch(i_ReceivedGuessResult){
             case SUCCESSFUL_GUESS:
                 System.out.println("The card belonged to your team, and received a point!");
-                i_CurrentTeam.cardDown();
+                i_PlayingTeam.cardDown();
                 if(i_GuessLeft > 0){
                     System.out.println("You can guess " + i_GuessLeft + " more times!");
                 }
@@ -229,21 +230,34 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
                 }
                 break;
             case ENEMY_TEAM_HIT:
-                GroupTeam enemyTeam = i_ReceivedGuessResult.getGroupTeam().getPlayingTeam();
-                System.out.println("The card belonged to an enemy Team!" +
-                        "\n" + enemyTeam.getName() + " Received a point!" +
-                        "\n\nTurn Ends");
+                System.out.println("The card belonged to an enemy Team!");
+
+                if(i_GuessLeft > 0){
+                    System.out.println("You can guess " + i_GuessLeft + " more times!");
+                }
+                else{
+                    System.out.println("No guesses left! Turn Ends");
+                }
+
                 break;
             case BLACK_HIT:
                 GroupTeam teamLost = i_ReceivedGuessResult.getGroupTeam().getPlayingTeam();
                 System.out.println("Black card was flipped!" +
                         "\n" + teamLost.getName() + " Lost the game!");
+                break;
             case NEUTRAL_HIT:
-                System.out.println("Card flipped was neutral!" +
-                        "\n\nTurn Ends");
+                System.out.println("Card flipped was neutral!");
+
+                if(i_GuessLeft > 0){
+                    System.out.println("You can guess " + i_GuessLeft + " more times!");
+                }
+                else{
+                    System.out.println("No guesses left! Turn Ends");
+                }
+                break;
         }
 
-        showTeam(i_CurrentTeam);
+        showTeam(i_PlayingTeam);
         System.out.println();
         PauseConsole.pause();
     }
@@ -258,6 +272,11 @@ public class UiView implements UiViewInterface, ChoiceNotifier, UiActionConst , 
         Data.flipActiveGame();
         System.out.println("Game Ended!" +
                 "\nThe winning team is - " + i_WinnerTeam.getName());
+    }
+
+    @Override
+    public void successLoad() {
+        System.out.println("Successfully loaded file!");
     }
 
     @Override

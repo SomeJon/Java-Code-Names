@@ -1,10 +1,10 @@
 package engine.exception.loadxml;
 
-import engine.exception.CodeNameExceptions;
+import engine.exception.CodeNameException;
 
 import java.util.List;
 
-public class TeamNamesNotUnique extends CodeNameExceptions {
+public class TeamNamesNotUnique extends CodeNameException {
     List<String> NonUniqueNames;
 
     public TeamNamesNotUnique(List<String> i_NunUniqueNames) {

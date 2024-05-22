@@ -1,6 +1,6 @@
 package engine.exception;
 
-public class OutOfBoundException extends CodeNameExceptions{
+public class OutOfBoundException extends CodeNameException {
     private final String ParameterName;
     private final int ParameterValue;
     private final int Max;

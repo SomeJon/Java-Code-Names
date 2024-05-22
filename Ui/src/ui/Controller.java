@@ -9,7 +9,7 @@ import dto.type.data.DtoGroupTeam;
 import engine.EngineInterface;
 import engine.board.card.GroupTeam;
 import engine.data.Identification;
-import engine.exception.CodeNameExceptions;
+import engine.exception.CodeNameException;
 import engine.response.GuesserResponse;
 import engine.response.IdentificationResponse;
 import engine.response.LoadXmlResponse;
@@ -23,7 +23,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 
 public class Controller{
@@ -86,7 +85,7 @@ public class Controller{
             try {
                 Engine.loadXml(xmlResponse);
                 Ui.addFileData();
-            } catch (CodeNameExceptions e) {
+            } catch (CodeNameException e) {
                 Ui.exceptionHandler(e, false);
             } catch (Exception ignore) {}
         }
@@ -101,6 +100,7 @@ public class Controller{
         Engine.startGame();
         DtoBoard Board = (DtoBoard)Engine.getActiveBoard();
         Ui.updateBoard(Board);
+        Ui.showBoard((DtoBoard)Engine.getActiveBoard(), false);
     }
 
     private void playTurn(){
@@ -120,7 +120,7 @@ public class Controller{
                 currentIdentification = Engine.playTurnIdentification(response);
                 loopContinue = false;
             }
-            catch(CodeNameExceptions e){
+            catch(CodeNameException e){
                 Ui.exceptionHandler(e, false);
                 loopContinue = true;
             }
@@ -165,7 +165,7 @@ public class Controller{
                     if (loopContinue && guessCount > 0) {
                         Ui.showBoard((DtoBoard) Engine.getActiveBoard(), false);
                     }
-                } catch (CodeNameExceptions e) {
+                } catch (CodeNameException e) {
                     Ui.exceptionHandler(e, true);
                     loopContinue = true;
                 }
@@ -184,7 +184,7 @@ public class Controller{
         if (gameEnded) {
                     Ui.victoryHandler((i_EndResult).getWinningTeam());
         }
-        else if(i_GuessResult == DtoGuessResult.SUCCESSFUL_GUESS){
+        else if(i_GuessResult != DtoGuessResult.BLACK_HIT && i_GuessLeft > 1) {
                 loopContinue = true;
                 Ui.showTeam(((DtoGroupTeam) Engine.getActiveTeam()).getPlayingTeam());
         }

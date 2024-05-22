@@ -26,7 +26,7 @@ public class FileReader {
 
         words = gameData.getECNWords().getECNGameWords().trim().split("[ \t\n]+");
         normalWords = new HashSet<String>(Arrays.asList(words));
-        words = gameData.getECNWords().getECNBlackWords().trim().split("[ \t\n]+");
+        words = gameData.getECNWords().getECNGameWords().trim().split("[ \t\n]+");
         blackWords = new HashSet<String>(Arrays.asList(words));
 
         GameStatus status = loadStatus(gameData, normalWords.size(), blackWords.size());
@@ -34,7 +34,6 @@ public class FileReader {
         int columns = gameData.getECNBoard().getECNLayout().getColumns();
         int rows = gameData.getECNBoard().getECNLayout().getRows();
         i_DataHolder.loadData(status, columns, rows, normalWords, blackWords);
-        System.out.println(gameData);
 
     }
     private static ECNGame deserializeFrom(InputStream in) throws JAXBException {

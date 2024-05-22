@@ -1,8 +1,8 @@
 package engine.exception.turn;
 
-import engine.exception.CodeNameExceptions;
+import engine.exception.CodeNameException;
 
-public class CardFlippedException extends CodeNameExceptions {
+public class CardFlippedException extends CodeNameException {
     public CardFlippedException() {
         super.setType(ExceptionType.CARD_FLIPPED);
     }

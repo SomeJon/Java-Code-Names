@@ -20,7 +20,6 @@ public enum InputHandling {
 
             System.out.print("Enter a full xml file path: ");
             String path = scanner.nextLine();
-            path = path.replaceAll("\\s", "");
             File file = new File(path);
 
             if (!file.isFile()) {
@@ -39,7 +38,7 @@ public enum InputHandling {
 
             System.out.print("Enter a full file path, include the name of the file: ");
             String path = scanner.nextLine();
-            path = path + ".cd";
+            path = path + ".cn";
 
             o_Response.loadResponse(new FileLocationResponse(path));
         }
